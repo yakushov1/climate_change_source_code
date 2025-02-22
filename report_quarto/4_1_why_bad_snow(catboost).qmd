@@ -1,0 +1,119 @@
+---
+title: "Соотнесение информации о снежном покрове, полученной из различных источников"
+author: "Vasily Yakushov"
+format: 
+  html: 
+    code-fold: true
+    code-tools: true
+---
+
+Данные о степени покрытия почвы снегом до 2005 года записаны в виде баллов: 1 балл = 10% покрытия почвы снегом. А после 2005 года - в виде текстового описания. Данные были упрощены до 2 градаций: снег покрывает более или менее половины поверхности почвы. Задача: соотносятся ли результаты из разных источников?
+\ Схема решения следующая: сначала обучаем модель на тренировочной выборке (данные после 2005 года, проверям на валидационной части выборки (оставшиеся данные после 2005 года)). Затем проверям предсказания модели на тестовой выборке (данные до 2005 года, целевая переменная в которой была в виде баллов), если точность высокая, то данные сопоставимы.\
+В качестве модели был выбран catboost, расчеты реализованы на python
+
+### Шаг 1: Загрузка необходимых библиотек.
+```{python}
+import pandas as pd
+from catboost import CatBoostClassifier
+from catboost import Pool
+import shap
+import matplotlib.pyplot as pl
+import matplotlib
+from matplotlib.ticker import NullLocator
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, precision_score
+from catboost.utils import get_roc_curve
+import sklearn
+from sklearn import metrics
+import matplotlib.pyplot as plt
+
+```
+
+### Шаг 2: Загрузка данных
+```{python}
+data = pd.read_csv("../initial_data/climate/snow__quality_with_other_parametrs.csv", sep = ';', decimal = ',')
+data = data[(data['Month']>=9) | (data['Month']<=5)] # отберем данные только за зимний период
+new_data = data[((data['Year']==2005) & (data['Month']>1)) | (data['Year']>2005)]
+old_data = data[(data['Year']<2005)]
+X_new = new_data.drop(['Sn_quality', 'Date', 'Year', 'Day', 'Month'], axis=1)
+y_new = new_data['Sn_quality']
+```
+### Шаг 3: Тренировочная и валидационная выборки на данных после 2005 года
+```{python}
+X_train, X_val, y_train, y_val = train_test_split(X_new, y_new, test_size=0.2, random_state=42)
+```
+
+### Шаг 4: Тестовая часть выборки - данные до 2005 года
+```{python}
+X_test = old_data.drop(['Sn_quality', 'Date', 'Year', 'Day', "Month"], axis=1)
+y_test = old_data['Sn_quality']
+```
+### Шаг 5: Построение модели
+
+```{python}
+model_with_early_stop=CatBoostClassifier(
+    eval_metric='AUC',
+    iterations=200,
+    random_seed=63,
+    learning_rate=0.3,
+    early_stopping_rounds=20)
+model_with_early_stop.fit(
+    X_train,y_train,
+    eval_set=(X_val, y_val),
+    verbose=False,
+    plot=True
+)
+```
+### Шаг 6: Оценка модели на валидационной (слева) и тестовой (справа) выборке
+
+```{python}
+
+# оценка на валидационной выборке
+plt.figure(figsize=(8,5))
+lw=2
+plt.subplot(1, 2, 1)
+eval_pool = Pool(X_val, y_val)
+curve = get_roc_curve(model_with_early_stop, eval_pool)
+(fpr, tpr, thresholds)=curve
+roc_auc=sklearn.metrics.auc(fpr, tpr)
+
+plt.plot(fpr, tpr, color='darkorange',
+         lw=lw, label='ROC curve (area = %0.2f)' % roc_auc, alpha=0.5)
+
+plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--', alpha=0.5)
+
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xticks(fontsize=8)
+plt.yticks(fontsize=8)
+plt.grid(True)
+plt.ylabel('True Positive Rate', fontsize=8)
+plt.title('A', fontsize=8)
+plt.legend(loc="lower right", fontsize=8)
+
+
+
+# оценка на тестовой  выборке
+pl.subplot(1, 2, 2)
+eval_pool = Pool(X_test, y_test )
+curve = get_roc_curve(model_with_early_stop, eval_pool)
+(fpr, tpr, thresholds)=curve
+roc_auc=sklearn.metrics.auc(fpr, tpr)
+plt.plot(fpr, tpr, color='darkorange',
+         lw=lw, label='ROC curve (area = %0.2f)' % roc_auc, alpha=0.5)
+
+plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--', alpha=0.5)
+
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xticks(fontsize=8)
+plt.yticks(fontsize=8)
+plt.grid(True)
+plt.title('Б', fontsize=8)
+
+plt.legend(loc="lower right", fontsize=8)
+txt="False Positive Rate"
+plt.figtext(0.5, 0.01, txt, wrap=True, horizontalalignment='center', fontsize=10)
+plt.show()
+```
+Видим, что площадь под кривой в обоих случаях большая (0.97 на валидации и 0.96 на тестовой выборке), следовательно, делаем вывод, что данные из разных источников хорошо соотносятся друг с другом.

@@ -1,0 +1,13 @@
+Station,Parametr,Month,RR,P,b
+average_by_all_station,tavg,1,0.06,0.08701,0.0206
+average_by_all_station,tavg,2,0.31,4e-5,0.0809
+average_by_all_station,tavg,3,0.8,0,0.116
+average_by_all_station,tavg,4,0.54,0,0.0878
+average_by_all_station,tavg,5,0.79,0,0.0677
+average_by_all_station,tavg,6,0.52,0,0.0717
+average_by_all_station,tavg,7,0.01,0.49401,0.00274
+average_by_all_station,tavg,8,0.01,0.50268,0.00335
+average_by_all_station,tavg,9,0.12,0.01656,0.0147
+average_by_all_station,tavg,10,0.73,0,0.0692
+average_by_all_station,tavg,11,0.08,0.05428,-0.0217
+average_by_all_station,tavg,12,0.09,0.03639,0.0262

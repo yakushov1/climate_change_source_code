@@ -1,0 +1,512 @@
+climatic_parametr <- bad_snow |>
+full_join(average_parametr, by = "Year") |>
+full_join(melt_freeze, by = "Year") |>
+full_join(season_by_temperature, by = "Year") |>
+arrange(Year) |>
+mutate(count = case_when(is.na(count)~0, .default = count))
+rm(bad_snow, average_parametr, melt_freeze, season_by_temperature)
+# Годы с отрицательной выживаемостью  -------------------------------------
+type_with_negative_survival_and_climate <- winter_survival |>
+left_join(climatic_parametr, by="Year")
+View(type_with_negative_survival_and_climate)
+source("A:/disser_calculation_new/scripts/climate+numbers/1_data_preparing.R")
+#+eval=FALSE
+library(tidyverse)
+library(MuMIn)
+# Import ------------------------------------------------------------------
+type_of_dynamic<- read_csv2("initial_data/numbers+climate/type_of_dynamic_with_climate.csv")
+common_spec_with_neg_survival <- read_csv2("initial_data/numbers+climate/common_spec_type_with_neg_survival.csv")
+uncommon_spec_with_neg_survival <- read_csv2("initial_data/numbers+climate/uncommon_spec_type_with_neg_survival.csv")
+# Functions ----------------------------------------------------------------
+log_reg_for_each_spec <- function(df, spec_name){
+one_spec <- df |>
+filter(Spec == spec_name) |>
+select(-Spec)
+model_type <- glm(Type~.,family = "binomial", one_spec)
+options(na.action="na.fail")
+result <- dredge(model_type)
+n_models <- result |>
+filter(delta<2) |>
+nrow()
+if (n_models>1){
+est <- model.avg(result, subset = delta<2)
+avg_result <- summary(est)$coefmat.subset |>
+as_tibble(rownames = "features") |>
+cbind(confint(est)) |>
+mutate(Spec = spec_name) |>
+rename(P_val = `Pr(>|z|)`) |>
+select(-`z value`) |>
+mutate(N_models = n_models)
+}
+if (n_models==1){
+a <- summary(model_type)
+avg_result <- a$coefficients |>
+as_tibble(rownames = "features") |>
+cbind(confint(model_type)) |>
+mutate(Spec = spec_name) |>
+rename(P_val = `Pr(>|z|)`) |>
+select(-`z value`) |>
+mutate(N_models = n_models)
+}
+return(avg_result)
+}
+# Когда численность в июне<августа для доминантов -------------------------
+with_neg_surv_for_common_spec <- common_spec_with_neg_survival |>
+mutate(Spec = "common") |>
+log_reg_for_each_spec("common") |>
+select(N_models, features, Estimate, `Std. Error`, P_val, `2.5 %`, `97.5 %`) |>
+mutate(across(where(is.numeric), round, 4)) |>
+filter(P_val <0.05)
+with_neg_surv_for_uncommon_spec <- uncommon_spec_with_neg_survival |>
+mutate(Spec = "uncommon") |>
+log_reg_for_each_spec("uncommon") |>
+select(N_models, features, Estimate, `Std. Error`, P_val, `2.5 %`, `97.5 %`) |>
+mutate(across(where(is.numeric), round, 4)) |>
+filter(P_val <0.05)
+View(with_neg_surv_for_common_spec)
+View(with_neg_surv_for_uncommon_spec)
+source("A:/disser_calculation_new/scripts/climate+numbers/1_data_preparing.R")
+#+eval=FALSE
+library(tidyverse)
+library(MuMIn)
+# If your outcome is binary (zeros and ones), proportions of "successes" and "failures"
+# (values between 0 and 1), or their counts, you can use Binomial distribution,
+# i.e. the logistic regression model.
+# If there is more then two categories,
+# you would use multinomial distribution in multinomial regression.
+# https://stats.stackexchange.com/questions/190763/how-to-decide-which-glm-family-to-use
+# Import ------------------------------------------------------------------
+type_of_dynamic<- read_csv2("initial_data/numbers+climate/type_of_dynamic_with_climate.csv")
+common_spec_with_neg_survival <- read_csv2("initial_data/numbers+climate/common_spec_type_with_neg_survival.csv")
+uncommon_spec_with_neg_survival <- read_csv2("initial_data/numbers+climate/uncommon_spec_type_with_neg_survival.csv")
+# Functions ----------------------------------------------------------------
+log_reg_for_each_spec <- function(df, spec_name){
+one_spec <- df |>
+filter(Spec == spec_name) |>
+select(-Spec)
+model_type <- glm(Type~.,family = "binomial", one_spec)
+options(na.action="na.fail")
+result <- dredge(model_type)
+n_models <- result |>
+filter(delta<2) |>
+nrow()
+if (n_models>1){
+est <- model.avg(result, subset = delta<2)
+avg_result <- summary(est)$coefmat.subset |>
+as_tibble(rownames = "features") |>
+cbind(confint(est)) |>
+mutate(Spec = spec_name) |>
+rename(P_val = `Pr(>|z|)`) |>
+select(-`z value`) |>
+mutate(N_models = n_models)
+}
+if (n_models==1){
+a <- summary(model_type)
+avg_result <- a$coefficients |>
+as_tibble(rownames = "features") |>
+cbind(confint(model_type)) |>
+mutate(Spec = spec_name) |>
+rename(P_val = `Pr(>|z|)`) |>
+select(-`z value`) |>
+mutate(N_models = n_models)
+}
+return(avg_result)
+}
+# Когда численность в июне<августа для доминантов -------------------------
+with_neg_surv_for_common_spec <- common_spec_with_neg_survival |>
+mutate(Spec = "common") |>
+log_reg_for_each_spec("common") |>
+select(N_models, features, Estimate, `Std. Error`, P_val, `2.5 %`, `97.5 %`) |>
+mutate(across(where(is.numeric), round, 4)) |>
+filter(P_val <0.05)
+with_neg_surv_for_uncommon_spec <- uncommon_spec_with_neg_survival |>
+mutate(Spec = "uncommon") |>
+log_reg_for_each_spec("uncommon") |>
+select(N_models, features, Estimate, `Std. Error`, P_val, `2.5 %`, `97.5 %`) |>
+mutate(across(where(is.numeric), round, 4)) |>
+filter(P_val <0.05)
+View(with_neg_surv_for_common_spec)
+View(with_neg_surv_for_uncommon_spec)
+write_csv2(with_neg_surv_for_common_spec, "initial_data/numbers+climate/log_reg/type_of_dynamic_with_negative_survival/significant_common_spec_with_neg_surv.csv")
+source("A:/disser_calculation_new/scripts/climate+numbers/1_data_preparing.R")
+source("A:/disser_calculation_new/scripts/climate+numbers/3_logistic regression.R")
+library(tidyverse)
+library(patchwork)
+all_spec <- read_csv2("initial_data/numbers+climate/type_of_dynamic_with_climate.csv")
+View(all_spec)
+all_spec <- read_csv2("initial_data/numbers+climate/type_of_dynamic_with_climate.csv") |>
+select(-Spec)
+View(all_spec)
+u_test <- function(df){
+df |>
+pivot_longer(cols = -Type, names_to = "Parametr", values_to = "values") |>
+mutate(across(c(Type, Parametr), \(x) as.factor(x))) |>
+mutate(Type = case_when(Type == 0 ~ "non_cyclic",
+.default = "cyclic")) |>
+group_by(Type, Parametr) |>
+summarise(values = list(values)) |>
+spread(Type, values) |>
+group_by(Parametr) |>
+mutate(p_value = round(wilcox.test(unlist(cyclic), unlist(non_cyclic))$p.value, 3)) |>
+mutate(Pval_adj = p.adjust(p_value, "BY")) |>
+filter(Pval_adj<0.05)
+}
+graph_template <- function(df, sign_parametr, title){
+df |>
+pivot_longer(cols = -Type, names_to = "Parametr", values_to = "values") |>
+mutate(across(c(Type, Parametr), \(x) as.factor(x))) |>
+filter(Parametr %in% sign_parametr) |>
+mutate(Type = case_when(
+Type == 1 ~ "циклические",
+.default = "флуктуации"
+)) |>
+ggplot(aes(y=values, col = Type))+
+geom_boxplot()+
+labs(x = NULL,
+y = NULL,
+col = "Тип динамики",
+title = title)+
+theme_minimal()+
+theme(legend.position = "bottom",
+legend.position.inside = (c(0.75,0.25)),
+axis.text.x = element_blank(),
+strip.placement = "outside")
+}
+all_spec_wilcox <- u_test(all_spec)
+View(all_spec_wilcox)
+graph_template(all_spec,
+sign_parametr = c(as.character(all_spec_wilcox$Parametr)),
+title = "")+
+facet_wrap(.~Parametr, scales = "free_y", ncol=2, strip.position = "left")
+library(tidyverse)
+# Import ------------------------------------------------------------------
+winter_survival <- read_csv2("initial_data/numbers/winter_survival.csv")
+type_of_dynamic <- read_csv2("initial_data/numbers/type_of_dynamic.csv") |>
+select(-Numbers)
+# Import climatic variables --------------------------------------------------
+bad_snow <- read_csv2("initial_data/climate/cleaned/all_station_bad_snow.csv") |>
+filter(Station == "Бахта") |>
+select(Year, count)
+average_parametr <- read_csv2("initial_data/climate/cleaned/monthly_anomaly.csv") |>
+filter(Station == "bakhta") |>
+filter(Month %in% c(10,11,4,5)) |>
+select(Year, Month, Tavg, Sn) |>
+pivot_wider(id_cols = Year, values_from = c(Tavg, Sn), names_from = Month) |>
+mutate(across(ends_with(c("10", "11")), ~lag(.x))) #Месяцы 10,11 сместили на +1 (так как сопоставляем с данными по численности со следующим годом)
+melt_freeze <- read_csv2("initial_data/climate/cleaned/melt_freeze_all_winter.csv")
+season_by_temperature <- read_csv2("initial_data/climate/cleaned/season_by_temperature.csv") |>
+select(Year, Season, Dur_by_temp = Duration) |>
+filter(Season %in% c("Spring", "Autumn", "Winter")) |>
+pivot_wider(id_cols = Year, names_from = Season, values_from = Dur_by_temp) |>
+mutate(Autumn = lag(Autumn)) |> #Потому что осень влияет на данные след. года
+mutate(across(everything(), \(x) case_when(is.na(x) ~ 0, .default = x))) |>  # NA означает 0 (значит переходы были резкими, а не размазанными)
+select(-Winter)
+climatic_parametr <- bad_snow |>
+full_join(average_parametr, by = "Year") |>
+full_join(melt_freeze, by = "Year") |>
+full_join(season_by_temperature, by = "Year") |>
+arrange(Year) |>
+mutate(count = case_when(is.na(count)~0, .default = count))
+rm(bad_snow, average_parametr, melt_freeze, season_by_temperature)
+# Годы с отрицательной выживаемостью  -------------------------------------
+type_with_negative_survival_and_climate <- winter_survival |>
+left_join(climatic_parametr, by="Year") |>
+ungroup() |>
+filter(survival_rate<median(survival_rate))|>
+select(-c(Year, Spec, survival_rate, survival))
+common_spec_type_with_neg_survival <- type_with_negative_survival_and_climate |>
+filter(dominant == "common_spec") |>
+select(-dominant)
+uncommon_spec_type_with_neg_survival <- type_with_negative_survival_and_climate |>
+filter(dominant == "uncommon") |>
+select(-dominant)
+# Годы с отрицательной выживаемостью  -------------------------------------
+type_with_negative_survival_and_climate <- winter_survival |>
+left_join(climatic_parametr, by="Year") |>
+ungroup() |>
+filter(survival_rate<median(survival_rate))|>
+select(-c(Spec, survival_rate, survival))
+common_spec_type_with_neg_survival <- type_with_negative_survival_and_climate |>
+filter(dominant == "common_spec") |>
+select(-dominant)
+uncommon_spec_type_with_neg_survival <- type_with_negative_survival_and_climate |>
+filter(dominant == "uncommon") |>
+select(-dominant)
+levels(as.factor(common_spec_type_with_neg_survival$Year))
+View(common_spec_type_with_neg_survival)
+levels(as.factor(common_spec_type_with_neg_survival$Year[common_spec_type_with_neg_survival$Type == 1]))
+levels(as.factor(common_spec_type_with_neg_survival$Year[common_spec_type_with_neg_survival$Type == 0]))
+library(tidyverse)
+# Import ------------------------------------------------------------------
+winter_survival <- read_csv2("initial_data/numbers/winter_survival.csv")
+type_of_dynamic <- read_csv2("initial_data/numbers/type_of_dynamic.csv") |>
+select(-Numbers)
+# Import climatic variables --------------------------------------------------
+bad_snow <- read_csv2("initial_data/climate/cleaned/all_station_bad_snow.csv") |>
+filter(Station == "Бахта") |>
+select(Year, count)
+average_parametr <- read_csv2("initial_data/climate/cleaned/monthly_anomaly.csv") |>
+filter(Station == "bakhta") |>
+filter(Month %in% c(10,11,4,5)) |>
+select(Year, Month, Tavg, Sn) |>
+pivot_wider(id_cols = Year, values_from = c(Tavg, Sn), names_from = Month) |>
+mutate(across(ends_with(c("10", "11")), ~lag(.x))) #Месяцы 10,11 сместили на +1 (так как сопоставляем с данными по численности со следующим годом)
+melt_freeze <- read_csv2("initial_data/climate/cleaned/melt_freeze_all_winter.csv")
+season_by_temperature <- read_csv2("initial_data/climate/cleaned/season_by_temperature.csv") |>
+select(Year, Season, Dur_by_temp = Duration) |>
+filter(Season %in% c("Spring", "Autumn", "Winter")) |>
+pivot_wider(id_cols = Year, names_from = Season, values_from = Dur_by_temp) |>
+mutate(Autumn = lag(Autumn)) |> #Потому что осень влияет на данные след. года
+mutate(across(everything(), \(x) case_when(is.na(x) ~ 0, .default = x))) |>  # NA означает 0 (значит переходы были резкими, а не размазанными)
+select(-Winter)
+climatic_parametr <- bad_snow |>
+full_join(average_parametr, by = "Year") |>
+full_join(melt_freeze, by = "Year") |>
+full_join(season_by_temperature, by = "Year") |>
+arrange(Year) |>
+mutate(count = case_when(is.na(count)~0, .default = count))
+rm(bad_snow, average_parametr, melt_freeze, season_by_temperature)
+# Годы с отрицательной выживаемостью  -------------------------------------
+type_with_negative_survival_and_climate <- winter_survival |>
+left_join(climatic_parametr, by="Year") |>
+ungroup() |>
+filter(survival_rate<median(survival_rate))|>
+select(-c(Year, Spec, survival_rate, survival))
+common_spec_type_with_neg_survival <- type_with_negative_survival_and_climate |>
+filter(dominant == "common_spec") |>
+select(-dominant)
+uncommon_spec_type_with_neg_survival <- type_with_negative_survival_and_climate |>
+filter(dominant == "uncommon") |>
+select(-dominant)
+type_with_negative_survival_and_climate <- winter_survival |>
+left_join(climatic_parametr, by="Year") |>
+ungroup() |>
+filter(survival_rate<median(survival_rate))|>
+select(-c(Spec, survival_rate, survival))
+levels(as.factor(type_with_negative_survival_and_climate$Year))
+common_spec_type_with_neg_survival <- type_with_negative_survival_and_climate |>
+filter(dominant == "common_spec") |>
+select(-с(dominant, Year))
+common_spec_type_with_neg_survival <- type_with_negative_survival_and_climate |>
+filter(dominant == "common_spec") |>
+select(-c(dominant, Year))
+uncommon_spec_type_with_neg_survival <- type_with_negative_survival_and_climate |>
+filter(dominant == "uncommon") |>
+select(-c(dominant, Year))
+View(uncommon_spec_type_with_neg_survival)
+View(common_spec_type_with_neg_survival)
+#В какие годы наблюдалась максимальная зимняя смертность?
+year_with_max_mortality <- levels(as.factor(type_with_negative_survival_and_climate$Year))
+View(climatic_parametr)
+# отбор климатических параметров в годы с максимальной зимней смертностью
+climatic_parametr |>
+filter(Year %in% year_with_max_mortality)
+# отбор климатических параметров в годы с максимальной зимней смертностью
+clim_parametr_with_max_mortality <- climatic_parametr |>
+filter(Year %in% year_with_max_mortality)
+View(clim_parametr_with_max_mortality)
+View(type_of_dynamic)
+type_of_dynamic |>
+filter(Spec == "Community")
+# отбор климатических параметров в годы с максимальной зимней смертностью
+clim_parametr_with_max_mortality <- climatic_parametr |>
+filter(Year %in% year_with_max_mortality) |>
+left_join(type_of_dynamic |> filter(Spec == "Community"), by="Year")
+View(clim_parametr_with_max_mortality)
+# отбор климатических параметров в годы с максимальной зимней смертностью
+clim_parametr_with_max_mortality <- climatic_parametr |>
+filter(Year %in% year_with_max_mortality) |>
+left_join(type_of_dynamic |> filter(Spec == "Community"), by="Year") |>
+select(-c(Year, Spec))
+View(clim_parametr_with_max_mortality)
+write.csv2(clim_parametr_with_max_mortality, "initial_data/numbers+climate/clim_parametr_with_max_mortality.csv", row.names = F)
+library(tidyverse)
+library(patchwork)
+clim_parametr_with_max_mortal <- read_csv2("initial_data/numbers+climate/clim_parametr_with_max_mortality.csv")
+View(clim_parametr_with_max_mortal)
+u_test <- function(df){
+df |>
+pivot_longer(cols = -Type, names_to = "Parametr", values_to = "values") |>
+mutate(across(c(Type, Parametr), \(x) as.factor(x))) |>
+mutate(Type = case_when(Type == 0 ~ "non_cyclic",
+.default = "cyclic")) |>
+group_by(Type, Parametr) |>
+summarise(values = list(values)) |>
+spread(Type, values) |>
+group_by(Parametr) |>
+mutate(p_value = round(wilcox.test(unlist(cyclic), unlist(non_cyclic))$p.value, 3)) |>
+mutate(Pval_adj = p.adjust(p_value, "BY")) |>
+filter(Pval_adj<0.05)
+}
+graph_template <- function(df, sign_parametr, title){
+df |>
+pivot_longer(cols = -Type, names_to = "Parametr", values_to = "values") |>
+mutate(across(c(Type, Parametr), \(x) as.factor(x))) |>
+filter(Parametr %in% sign_parametr) |>
+mutate(Type = case_when(
+Type == 1 ~ "циклические",
+.default = "флуктуации"
+)) |>
+ggplot(aes(y=values, col = Type))+
+geom_boxplot()+
+labs(x = NULL,
+y = NULL,
+col = "Тип динамики",
+title = title)+
+theme_minimal()+
+theme(legend.position = "bottom",
+legend.position.inside = (c(0.75,0.25)),
+axis.text.x = element_blank(),
+strip.placement = "outside")
+}
+all <- u_test(clim_parametr_with_max_mortal)
+library(tidyverse)
+# Import ------------------------------------------------------------------
+winter_survival <- read_csv2("initial_data/numbers/winter_survival.csv")
+type_of_dynamic <- read_csv2("initial_data/numbers/type_of_dynamic.csv") |>
+select(-Numbers)
+# Import climatic variables --------------------------------------------------
+bad_snow <- read_csv2("initial_data/climate/cleaned/all_station_bad_snow.csv") |>
+filter(Station == "Бахта") |>
+select(Year, count)
+average_parametr <- read_csv2("initial_data/climate/cleaned/monthly_anomaly.csv") |>
+filter(Station == "bakhta") |>
+filter(Month %in% c(10,11,4,5)) |>
+select(Year, Month, Tavg, Sn) |>
+pivot_wider(id_cols = Year, values_from = c(Tavg, Sn), names_from = Month) |>
+mutate(across(ends_with(c("10", "11")), ~lag(.x))) #Месяцы 10,11 сместили на +1 (так как сопоставляем с данными по численности со следующим годом)
+melt_freeze <- read_csv2("initial_data/climate/cleaned/melt_freeze_all_winter.csv")
+season_by_temperature <- read_csv2("initial_data/climate/cleaned/season_by_temperature.csv") |>
+select(Year, Season, Dur_by_temp = Duration) |>
+filter(Season %in% c("Spring", "Autumn", "Winter")) |>
+pivot_wider(id_cols = Year, names_from = Season, values_from = Dur_by_temp) |>
+mutate(Autumn = lag(Autumn)) |> #Потому что осень влияет на данные след. года
+mutate(across(everything(), \(x) case_when(is.na(x) ~ 0, .default = x))) |>  # NA означает 0 (значит переходы были резкими, а не размазанными)
+select(-Winter)
+climatic_parametr <- bad_snow |>
+full_join(average_parametr, by = "Year") |>
+full_join(melt_freeze, by = "Year") |>
+full_join(season_by_temperature, by = "Year") |>
+arrange(Year) |>
+mutate(count = case_when(is.na(count)~0, .default = count))
+rm(bad_snow, average_parametr, melt_freeze, season_by_temperature)
+# Годы с зимней смертностью > медианного значения  -------------------------------------
+type_with_negative_survival_and_climate <- winter_survival |>
+left_join(climatic_parametr, by="Year") |>
+ungroup() |>
+filter(survival_rate<median(survival_rate))|>
+select(-c(Spec, survival_rate, survival))
+#В какие годы наблюдалась максимальная зимняя смертность?
+year_with_max_mortality <- levels(as.factor(type_with_negative_survival_and_climate$Year))
+levels(as.factor(type_of_dynamic$Year))
+# метка, когда была максимальная смертность
+clim_parametr_with_max_mortality <- climatic_parametr |>
+mutate(max_mortality = case_when(
+Year %in% year_with_max_mortality ~ 1,
+.default =0
+))
+View(clim_parametr_with_max_mortality)
+write.csv2(clim_parametr_with_max_mortality, "initial_data/numbers+climate/clim_parametr_with_max_mortality.csv", row.names = F)
+library(tidyverse)
+library(patchwork)
+clim_parametr_with_max_mortal <- read_csv2("initial_data/numbers+climate/clim_parametr_with_max_mortality.csv")
+u_test <- function(df){
+df |>
+pivot_longer(cols = -Type, names_to = "Parametr", values_to = "values") |>
+mutate(across(c(Type, Parametr), \(x) as.factor(x))) |>
+mutate(Type = case_when(Type == 0 ~ "non_cyclic",
+.default = "cyclic")) |>
+group_by(Type, Parametr) |>
+summarise(values = list(values)) |>
+spread(Type, values) |>
+group_by(Parametr) |>
+mutate(p_value = round(wilcox.test(unlist(cyclic), unlist(non_cyclic))$p.value, 3)) |>
+mutate(Pval_adj = p.adjust(p_value, "BY")) |>
+filter(Pval_adj<0.05)
+}
+graph_template <- function(df, sign_parametr, title){
+df |>
+pivot_longer(cols = -Type, names_to = "Parametr", values_to = "values") |>
+mutate(across(c(Type, Parametr), \(x) as.factor(x))) |>
+filter(Parametr %in% sign_parametr) |>
+mutate(Type = case_when(
+Type == 1 ~ "циклические",
+.default = "флуктуации"
+)) |>
+ggplot(aes(y=values, col = Type))+
+geom_boxplot()+
+labs(x = NULL,
+y = NULL,
+col = "Тип динамики",
+title = title)+
+theme_minimal()+
+theme(legend.position = "bottom",
+legend.position.inside = (c(0.75,0.25)),
+axis.text.x = element_blank(),
+strip.placement = "outside")
+}
+View(clim_parametr_with_max_mortal)
+all <- clim_parametr_with_max_mortal |>
+rename(Type = max_mortality) |>
+select(-Year) |>
+u_test()
+# Import ------------------------------------------------------------------
+common_spec <- read_csv2("initial_data/numbers+climate/common_spec_type_with_neg_survival.csv")
+uncommon_spec <- read_csv2("initial_data/numbers+climate/uncommon_spec_type_with_neg_survival.csv")
+# U-test ------------------------------------------------------------------
+total_common_wilcox <- u_test(common_spec)
+total_uncommon_wilcox <- u_test(uncommon_spec)
+View(total_common_wilcox)
+View(total_uncommon_wilcox)
+View(total_common_wilcox)
+View(total_uncommon_wilcox)
+# Графики -----------------------------------------------------------------
+common_spec_sign_parametr_graph <- graph_template(common_spec,
+sign_parametr = c(as.character(total_common_wilcox$Parametr)),
+title = "Для доминантов")+
+facet_wrap(.~Parametr, scales = "free_y", ncol=2, strip.position = "left",
+labeller = as_labeller(
+c(count = "Кол-во дней, когда \n снег покрывал <50% \n поверхн. почвы",
+Sn_4 = "Глубина снега \n в апреле, см",
+Sn_5 = "Глубина снега \n в мае, см", Sn_9 = "Глубина снега \n в сентябре, см",
+Tavg_4 = "Средняя t \n  апреля, \u00B0C")))+
+theme(legend.position = "none")
+uncommon_spec_sign_parametr_graph <- graph_template(uncommon_spec,
+sign_parametr = c(as.character(total_uncommon_wilcox$Parametr)),
+title = "Для субдоминантов")+
+facet_wrap(.~Parametr, scales = "free_y", ncol=2, strip.position = "left",
+labeller = as_labeller(c(Spring = "Продолжительность \n климатической весны, дней",
+Tavg_4 = "Средняя t \n  апреля, \u00B0C") ))
+boxplot_for_common_and_uncommon <- common_spec_sign_parametr_graph / uncommon_spec_sign_parametr_graph +
+plot_layout(heights = c(2, 1))
+boxplot_for_common_and_uncommon
+View(common_spec)
+View(uncommon_spec)
+source("A:/disser_calculation_new/scripts/climate+numbers/1_data_preparing.R")
+View(type_of_dynamic_with_climate)
+type_of_dynamic_for_u_test <- type_of_dynamic |>
+left_join(climatic_parametr, by = "Year")
+View(type_of_dynamic_for_u_test)
+type_of_dynamic_for_u_test <- type_of_dynamic |>
+left_join(climatic_parametr, by = "Year") |>
+filter(is.na(Autumn)==F)
+View(type_of_dynamic_for_u_test)
+View(type_of_dynamic_for_u_test)
+type_of_dynamic_for_u_test <- type_of_dynamic |>
+left_join(climatic_parametr, by = "Year") |>
+filter(is.na(Autumn)==F) |>
+mutate(dominant = case_when(
+Spec %in% c("S._araneus","S._caecutiens", "C._rutilus", "M._oeconomus") ~ "common_spec",
+.default = "uncommon"
+))
+View(type_of_dynamic_for_u_test)
+type_of_dynamic_for_u_test <- type_of_dynamic |>
+left_join(climatic_parametr, by = "Year") |>
+filter(is.na(Autumn)==F) |>
+mutate(dominant = case_when(
+Spec %in% c("S._araneus","S._caecutiens", "C._rutilus", "M._oeconomus") ~ "common_spec",
+.default = "uncommon"
+)) |>
+select(-c(Year, Spec))
+View(type_of_dynamic_for_u_test)
+write_csv2(type_of_dynamic_for_u_test, "initial_data/numbers+climate/type_of_dynamic_for_u_test.csv")

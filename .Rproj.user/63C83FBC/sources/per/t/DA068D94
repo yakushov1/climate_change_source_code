@@ -1,0 +1,31 @@
+{
+    "id": "DA068D94",
+    "path": "A:/2_climate_for_github/report_quarto/index.qmd",
+    "project_path": "report_quarto/index.qmd",
+    "type": "quarto_markdown",
+    "hash": "1944941883",
+    "contents": "",
+    "dirty": false,
+    "created": 1740217526547.0,
+    "source_on_save": false,
+    "relative_order": 3,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "8,101",
+        "scrollLine": "0",
+        "rmdVisualMode": "false",
+        "rmdVisualWrapConfigured": "true",
+        "docOutlineVisible": "1",
+        "rmdVisualCollapsedChunks": "",
+        "rmdVisualModeLocation": "395:399.7597351074219"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1740221118,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1740221118948,
+    "read_only": false,
+    "read_only_alternatives": []
+}

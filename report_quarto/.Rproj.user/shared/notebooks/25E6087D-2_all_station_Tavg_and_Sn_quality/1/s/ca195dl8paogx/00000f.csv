@@ -1,0 +1,57 @@
+"0","#| label: Загрузка пакетов"
+"0","#| warning: false"
+"0","library(tidyverse)"
+"2","── [1mAttaching core tidyverse packages[22m ───────────────────────── tidyverse 2.0.0 ──
+[32m✔[39m [34mdplyr    [39m 1.1.4     [32m✔[39m [34mreadr    [39m 2.1.5
+[32m✔[39m [34mforcats  [39m 1.0.0     [32m✔[39m [34mstringr  [39m 1.5.1
+[32m✔[39m [34mggplot2  [39m 3.5.1     [32m✔[39m [34mtibble   [39m 3.2.1
+[32m✔[39m [34mlubridate[39m 1.9.4     [32m✔[39m [34mtidyr    [39m 1.3.1
+[32m✔[39m [34mpurrr    [39m 1.0.2     "
+"2","── [1mConflicts[22m ─────────────────────────────────────────── tidyverse_conflicts() ──
+[31m✖[39m [34mdplyr[39m::[32mfilter()[39m masks [34mstats[39m::filter()
+[31m✖[39m [34mdplyr[39m::[32mlag()[39m    masks [34mstats[39m::lag()
+[36mℹ[39m Use the ]8;;http://conflicted.r-lib.org/conflicted package]8;; to force all conflicts to become errors"
+"0","library(readxl)"
+"0","library(VIM) #для визуализации пропусков"
+"2","Загрузка требуемого пакета: colorspace
+"
+"2","Загрузка требуемого пакета: grid
+"
+"2","Registered S3 method overwritten by 'data.table':
+  method           from
+  print.data.table     
+"
+"2","VIM is ready to use.
+
+"
+"2","Suggestions and bug-reports can be submitted at: https://github.com/statistikat/VIM/issues
+"
+"2","
+Присоединяю пакет: ‘VIM’
+
+"
+"2","Следующий объект скрыт от ‘package:datasets’:
+
+    sleep
+
+"
+"0","library(rvest) #для копирования таблицы из веба"
+"2","
+Присоединяю пакет: ‘rvest’
+
+"
+"2","Следующий объект скрыт от ‘package:readr’:
+
+    guess_encoding
+
+"
+"0","library(pracma) #для подсчета скользящей средней"
+"2","
+Присоединяю пакет: ‘pracma’
+
+"
+"2","Следующий объект скрыт от ‘package:purrr’:
+
+    cross
+
+"

@@ -1,0 +1,13 @@
+Station,Parametr,Month,RR,P,b
+vorogovo,t_anomaly,1,0.01,0.69716,0.00456
+vorogovo,t_anomaly,2,0.3,7e-5,0.0876
+vorogovo,t_anomaly,3,0.82,0,0.111
+vorogovo,t_anomaly,4,0.56,0,0.0741
+vorogovo,t_anomaly,5,0.68,0,0.0636
+vorogovo,t_anomaly,6,0.45,0,0.0597
+vorogovo,t_anomaly,7,0.01,0.84334,8.67e-4
+vorogovo,t_anomaly,8,0.05,0.12577,0.00806
+vorogovo,t_anomaly,9,0.09,0.04389,0.0124
+vorogovo,t_anomaly,10,0.66,0,0.0595
+vorogovo,t_anomaly,11,0.05,0.14727,-0.0175
+vorogovo,t_anomaly,12,0.09,0.03998,0.0246

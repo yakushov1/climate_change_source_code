@@ -1,0 +1,13 @@
+Station,Parametr,Month,RR,P,b
+yartsevo,t_anomaly,1,0.01,0.53934,0.0079
+yartsevo,t_anomaly,2,0.24,4.7e-4,0.0848
+yartsevo,t_anomaly,3,0.85,0,0.105
+yartsevo,t_anomaly,4,0.51,0,0.071
+yartsevo,t_anomaly,5,0.55,0,0.056
+yartsevo,t_anomaly,6,0.36,1e-5,0.051
+yartsevo,t_anomaly,7,0.03,0.21083,-0.00635
+yartsevo,t_anomaly,8,0.02,0.37829,0.00539
+yartsevo,t_anomaly,9,0.03,0.22066,0.0057
+yartsevo,t_anomaly,10,0.5,0,0.05
+yartsevo,t_anomaly,11,0.09,0.04443,-0.0217
+yartsevo,t_anomaly,12,0.11,0.02458,0.0279

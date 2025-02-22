@@ -1,0 +1,29 @@
+{
+  "7_tables.qmd": {
+    "7_tables.html": "6886c450"
+  },
+  "1_import_and_cleaning.qmd": {
+    "1_import_and_cleaning.html": "5e77d333"
+  },
+  "2_all_station_Tavg_and_Sn_quality.qmd": {
+    "2_all_station_Tavg_and_Sn_quality.html": "e4ecc5a5"
+  },
+  "3_bad_snow.qmd": {
+    "3_bad_snow.html": "e194f8ff"
+  },
+  "4_why_bad_snow.qmd": {
+    "4_why_bad_snow.html": "2e4baed1"
+  },
+  "6_graphs.qmd": {
+    "6_graphs.html": "a10a07f3"
+  },
+  "about.qmd": {
+    "about.html": "a2e67c4b"
+  },
+  "index.qmd": {
+    "index.html": "be382272"
+  },
+  "4_1_why_bad_snow(catboost).qmd": {
+    "4_1_why_bad_snow(catboost).html": "94a73733"
+  }
+}

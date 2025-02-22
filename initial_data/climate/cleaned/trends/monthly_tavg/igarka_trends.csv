@@ -1,0 +1,13 @@
+Station,Parametr,Month,RR,P,b
+igarka,tavg,1,0.1,0.03365,0.032
+igarka,tavg,2,0.27,1.8e-4,0.0628
+igarka,tavg,3,0.55,0,0.115
+igarka,tavg,4,0.45,0,0.101
+igarka,tavg,5,0.9,0,0.07
+igarka,tavg,6,0.71,0,0.0967
+igarka,tavg,7,0.29,1.1e-4,0.0191
+igarka,tavg,8,0.04,0.20425,-0.00686
+igarka,tavg,9,0.21,0.00128,0.0217
+igarka,tavg,10,0.79,0,0.089
+igarka,tavg,11,0.14,0.01071,-0.0239
+igarka,tavg,12,0.11,0.02006,0.0288

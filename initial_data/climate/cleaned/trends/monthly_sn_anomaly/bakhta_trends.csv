@@ -1,0 +1,10 @@
+Station,Parametr,Month,RR,P,b
+bakhta,sn_anomaly,1,0.66,0,0.272
+bakhta,sn_anomaly,2,0.84,0,0.484
+bakhta,sn_anomaly,3,0.83,0,0.499
+bakhta,sn_anomaly,4,0.07,0.08083,0.1
+bakhta,sn_anomaly,5,0.07,0.08016,-0.0342
+bakhta,sn_anomaly,6,0.69,0,0.0228
+bakhta,sn_anomaly,7,0.11,0.02173,0.0284
+bakhta,sn_anomaly,8,0.09,0.0424,0.0405
+bakhta,sn_anomaly,9,0.15,0.00767,0.0808
